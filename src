@@ -1,0 +1,90 @@
+-- Passo 1: Criar o banco de dados
+SET SQL_SAFE_UPDATES = 0;
+drop database InventarioArmazem;
+CREATE DATABASE InventarioArmazem;
+USE InventarioArmazem;
+
+-- Passo 2: Criar as tabelas
+
+-- Tabela de Categorias
+CREATE TABLE Categorias (
+    CategoriaID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100)
+);
+
+-- Tabela de Fornecedores
+CREATE TABLE Fornecedores (
+    FornecedorID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100),
+    Contato VARCHAR(100),
+    Endereco TEXT
+);
+
+-- Tabela de Produtos
+CREATE TABLE Produtos (
+    ProdutoID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100),
+    Descricao TEXT,
+    Preco DECIMAL(10, 2),
+    QuantidadeEmEstoque INT,
+    CategoriaID INT,
+    FOREIGN KEY (CategoriaID) REFERENCES Categorias(CategoriaID) ON DELETE CASCADE
+);
+
+-- Passo 3: Inserir dados
+
+-- Inserindo categorias
+INSERT INTO Categorias (Nome) VALUES 
+('Eletrônicos'),
+('Alimentos'),
+('Roupas');
+
+-- Inserindo fornecedores
+INSERT INTO Fornecedores (Nome, Contato, Endereco) VALUES 
+('Fornecedor A', 'fornecedorA@example.com', 'Rua 1, Cidade X'),
+('Fornecedor B', 'fornecedorB@example.com', 'Rua 2, Cidade Y'),
+('Fornecedor C', 'fornecedorC@example.com', 'Rua 3, Cidade Z');
+
+-- Inserindo produtos
+INSERT INTO Produtos (Nome, Descricao, Preco, QuantidadeEmEstoque, CategoriaID) VALUES 
+('Notebook', 'Notebook com 16GB de RAM', 4500.00, 10, 1),
+('Câmera Digital', 'Câmera com resolução 4K', 1500.00, 5, 1),
+('Arroz', 'Pacote de arroz de 5kg', 25.00, 200, 2),
+('Camiseta', 'Camiseta de algodão', 50.00, 150, 3),
+('Jeans', 'Calça jeans masculina', 120.00, 100, 3);
+
+-- Passo 4: Consultar dados
+
+-- Listar todos os produtos disponíveis em estoque
+SELECT * FROM Produtos;
+
+-- Mostrar todos os produtos que pertencem a uma categoria específica (Exemplo: Categoria "Roupas")
+SELECT * FROM Produtos WHERE CategoriaID = (SELECT CategoriaID FROM Categorias WHERE Nome = 'Roupas');
+
+-- Exibir informações sobre os fornecedores que fornecem produtos acima de um determinado preço (Exemplo: preço > 100)
+SELECT Fornecedores.Nome, Fornecedores.Contato, Fornecedores.Endereco 
+FROM Fornecedores 
+JOIN Produtos ON Produtos.CategoriaID = Fornecedores.FornecedorID 
+WHERE Produtos.Preco > 100;
+
+-- Passo 5: Atualizar dados
+
+-- Atualizar o preço de um produto específico (Exemplo: produto 'Notebook')
+UPDATE Produtos SET Preco = 4700.00 WHERE Nome = 'Notebook';
+
+-- Modificar a descrição de uma categoria existente (Exemplo: categoria 'Roupas')
+UPDATE Categorias SET Nome = 'Vestuário' WHERE Nome = 'Roupas';
+
+-- Alterar o endereço de um fornecedor específico (Exemplo: 'Fornecedor A')
+UPDATE Fornecedores SET Endereco = 'Rua Nova, Cidade X' WHERE Nome = 'Fornecedor A';
+
+-- Passo 6: Deletar dados
+
+-- Remover um produto do inventário (Exemplo: produto 'Câmera Digital')
+DELETE FROM Produtos WHERE Nome = 'Câmera Digital';
+
+-- Excluir uma categoria e garantir que os produtos associados sejam removidos (Exemplo: categoria 'Alimentos')
+DELETE FROM Categorias WHERE Nome = 'Alimentos';
+
+-- Apagar um fornecedor, verificando se não há produtos ainda associados a ele (Exemplo: 'Fornecedor B')
+DELETE FROM Fornecedores WHERE Nome = 'Fornecedor B';
